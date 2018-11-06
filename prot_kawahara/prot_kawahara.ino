@@ -7,6 +7,11 @@
 #endif
 
 #define SERVO_DEFAULT 90
+#define SERVO_L_MAX   45
+#define SERVO_R_MAX   135
+
+int l_pwm = 255;
+int r_pwm = 255;
 
 USB Usb;
 BTD Btd(&Usb);
@@ -20,19 +25,22 @@ bool printTemperature, printAngle;
 int direction(int x,int y){
   double deg,rad;
   int pattern = 0;
-  x -= 128; //中心(0,0)の座標平面に変換
+  
+  x -= 128;
   y = abs(y - 256) - 128;
+  
   rad = atan2((double)y,(double)x);
-  deg = rad * 180.0 /(atan(1.0) * 4.0); //ラジアンを度に変換
-  if(abs(x) > 16 || abs(y)> 16){ // x,yが16以下の時は0を返す
-    //pattern = 12;
-    deg += 180.0;// 0<=deg<=360として方向を判別
+  deg = rad * 180.0 /(atan(1.0) * 4.0);
+  
+  if(abs(x) > 16 || abs(y)> 16){
+    deg += 180.0;
     for(int i = 0;i < 12;i++){
       if(deg >= 0.0 + (i * 30.0) && deg < 30.0 + (i * 30.0))
         pattern = i + 1;
     }
     Serial.print(deg);
   }
+  
   return pattern;
 }
 
@@ -59,39 +67,86 @@ void loop() {
   Usb.Task();
 
   if (PS3.PS3Connected || PS3.PS3NavigationConnected) {
-    switch(direction(PS3.getAnalogHat(LeftHatX),PS3.getAnalogHat(LeftHatY))){
+//    switch(direction(PS3.getAnalogHat(RightHatX),PS3.getAnalogHat(RightHatY))){
+//      case 0:
+//        Serial.print(F("\r\nStop"));
+//        Stop();
+//        break;
+//      case 1:
+//      case 2:
+//      case 12:
+//        Serial.print(F("\r\nUp"));
+//        Up();
+//        break;
+//      case 3:
+//      case 4:
+//      case 5:
+//        Serial.print(F("\r\nLeft"));
+//        Left();
+//        break;
+//      case 6:
+//      case 7:
+//      case 8:
+//        Serial.print(F("\r\nDown"));
+//        Down();
+//        break;
+//      case 9:
+//      case 10:
+//      case 11:
+//        Serial.print(F("\r\nRight"));
+//        Right();
+//        break;
+//      default:
+//        Stop();
+//        break;
+//    }
+
+    switch(direction(PS3.getAnalogHat(RightHatX),PS3.getAnalogHat(RightHatY))){
       case 0:
         Serial.print(F("\r\nStop"));
         Stop();
         break;
       case 1:
-      case 2:
-      case 12:
         Serial.print(F("\r\nUp"));
-        Up();
+        l_pwm = map(PS3.getAnalogHat(RightHatY), 127, 0, 0, 255);
+        r_pwm = map(PS3.getAnalogHat(RightHatY), 127, 0, 0, 255);
+        Up(l_pwm, r_pwm);
         break;
-      case 3:
       case 4:
-      case 5:
         Serial.print(F("\r\nLeft"));
-        Left();
+        l_pwm = map(PS3.getAnalogHat(RightHatX), 127, 0, 0, 255);
+        r_pwm = map(PS3.getAnalogHat(RightHatX), 127, 0, 0, 255);
+        Left(l_pwm, r_pwm);
         break;
-      case 6:
       case 7:
-      case 8:
         Serial.print(F("\r\nDown"));
-        Down();
+        l_pwm = map(PS3.getAnalogHat(RightHatY), 127, 255, 0, 255);
+        r_pwm = map(PS3.getAnalogHat(RightHatY), 127, 255, 0, 255);
+        Down(l_pwm, r_pwm);
         break;
-      case 9:
       case 10:
-      case 11:
         Serial.print(F("\r\nRight"));
-        Right();
+        l_pwm = map(PS3.getAnalogHat(RightHatX), 127, 255, 0, 255);
+        r_pwm = map(PS3.getAnalogHat(RightHatX), 127, 255, 0, 255);
+        Right(l_pwm, r_pwm);
         break;
       default:
         Stop();
         break;
     }
+
+    if (PS3.getAnalogHat(LeftHatX) < 117) {
+      Serial.print(F("\r\nLeftHatX: "));
+      Serial.print(PS3.getAnalogHat(LeftHatX));
+      servo_pos = map(PS3.getAnalogHat(LeftHatX), 127, 0, SERVO_DEFAULT, SERVO_L_MAX);
+    } else if (PS3.getAnalogHat(LeftHatX) > 137) {
+      Serial.print(F("\r\nLeftHatX: "));
+      Serial.print(PS3.getAnalogHat(LeftHatX));
+      servo_pos = map(PS3.getAnalogHat(LeftHatX), 127, 255, SERVO_DEFAULT, SERVO_R_MAX);
+    } else {
+      servo_pos = SERVO_DEFAULT;
+    }
+    servo.write(servo_pos);
     
     if (PS3.getButtonClick(PS)) {
       Serial.print(F("\r\nPS"));
@@ -124,23 +179,23 @@ void loop() {
         Serial.print(F("\r\nLeft"));
       }
 
-      if (PS3.getButtonPress(L1)) {
-        Serial.print(F("\r\nL1"));
-        servo_pos = 45;
-      } else if (PS3.getButtonPress(R1)) {
-        Serial.print(F("\r\nR1"));
-        servo_pos = 135;
-      } else if (PS3.getAnalogButton(L2)) {
-        Serial.print(F("\r\nL2: "));
-        servo_pos = map(servo_pos, 0, 255, SERVO_DEFAULT, 45);
-      } else if (PS3.getAnalogButton(R2)) {
-        Serial.print(F("\tR2: "));
-        servo_pos = map(servo_pos, 0, 255, SERVO_DEFAULT, 135);
-      } else {
-        servo_pos = SERVO_DEFAULT;
-      }
-      Serial.print(servo_pos);
-      servo.write(servo_pos);
+//      if (PS3.getButtonPress(L1)) {
+//        Serial.print(F("\r\nL1"));
+//        servo_pos = SERVO_L_MAX;
+//      } else if (PS3.getButtonPress(R1)) {
+//        Serial.print(F("\r\nR1"));
+//        servo_pos = SERVO_R_MAX;
+//      } else if (PS3.getAnalogButton(L2)) {
+//        Serial.print(F("\r\nL2: "));
+//        servo_pos = map(servo_pos, 0, 255, SERVO_DEFAULT, SERVO_L_MAX);
+//      } else if (PS3.getAnalogButton(R2)) {
+//        Serial.print(F("\tR2: "));
+//        servo_pos = map(servo_pos, 0, 255, SERVO_DEFAULT, SERVO_R_MAX);
+//      } else {
+//        servo_pos = SERVO_DEFAULT;
+//      }
+//      Serial.print(servo_pos);
+//      servo.write(servo_pos);
       
       if (PS3.getButtonClick(SELECT)) {
         Serial.print(F("\r\nSelect - "));
@@ -161,30 +216,30 @@ void Stop() {
   digitalWrite(5, LOW);
 }
 
-void Up() {
-  digitalWrite(2, LOW);
-  digitalWrite(3, HIGH);
-  digitalWrite(4, LOW);
-  digitalWrite(5, HIGH);
+void Up(int l, int r) {
+  analogWrite(2, 0);
+  analogWrite(3, l);
+  analogWrite(4, 0);
+  analogWrite(5, r);
 }
 
-void Right() {
-  digitalWrite(2, HIGH);
-  digitalWrite(3, LOW);
-  digitalWrite(4, LOW);
-  digitalWrite(5, HIGH);
+void Left(int l, int r) {
+  analogWrite(2, l);
+  analogWrite(3, 0);
+  analogWrite(4, 0);
+  analogWrite(5, r);
 }
 
-void Down() {
-  digitalWrite(2, HIGH);
-  digitalWrite(3, LOW);
-  digitalWrite(4, HIGH);
-  digitalWrite(5, LOW);
+void Down(int l, int r) {
+  analogWrite(2, l);
+  analogWrite(3, 0);
+  analogWrite(4, r);
+  analogWrite(5, 0);
 }
 
-void Left() {
-  digitalWrite(2, LOW);
-  digitalWrite(3, HIGH);
-  digitalWrite(4, HIGH);
-  digitalWrite(5, LOW);
+void Right(int l, int r) {
+  analogWrite(2, 0);
+  analogWrite(3, l);
+  analogWrite(4, r);
+  analogWrite(5, 0);
 }
