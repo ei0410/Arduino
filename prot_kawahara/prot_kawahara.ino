@@ -187,10 +187,10 @@ void loop() {
 //        servo_pos = SERVO_R_MAX;
 //      } else if (PS3.getAnalogButton(L2)) {
 //        Serial.print(F("\r\nL2: "));
-//        servo_pos = map(servo_pos, 0, 255, SERVO_DEFAULT, SERVO_L_MAX);
+//        servo_pos = map(PS3.getAnalogButton(L2), 0, 255, SERVO_DEFAULT, SERVO_L_MAX);
 //      } else if (PS3.getAnalogButton(R2)) {
 //        Serial.print(F("\tR2: "));
-//        servo_pos = map(servo_pos, 0, 255, SERVO_DEFAULT, SERVO_R_MAX);
+//        servo_pos = map(PS3.getAnalogButton(R2), 0, 255, SERVO_DEFAULT, SERVO_R_MAX);
 //      } else {
 //        servo_pos = SERVO_DEFAULT;
 //      }
@@ -219,27 +219,27 @@ void Stop() {
 void Up(int l, int r) {
   analogWrite(2, 0);
   analogWrite(3, l);
-  analogWrite(4, 0);
-  analogWrite(5, r);
+  analogWrite(4, r);
+  analogWrite(5, 0);
 }
 
 void Left(int l, int r) {
   analogWrite(2, l);
   analogWrite(3, 0);
-  analogWrite(4, 0);
-  analogWrite(5, r);
+  analogWrite(4, r);
+  analogWrite(5, 0);
 }
 
 void Down(int l, int r) {
   analogWrite(2, l);
   analogWrite(3, 0);
-  analogWrite(4, r);
-  analogWrite(5, 0);
+  analogWrite(4, 0);
+  analogWrite(5, r);
 }
 
 void Right(int l, int r) {
   analogWrite(2, 0);
   analogWrite(3, l);
-  analogWrite(4, r);
-  analogWrite(5, 0);
+  analogWrite(4, 0);
+  analogWrite(5, r);
 }
