@@ -6,6 +6,17 @@
 #include <SPI.h>
 #endif
 
+typedef enum {
+  MANUAL,
+  AUTO
+} Mode;
+
+Mode gMode = MANUAL;
+
+int threshold[8] = {600, 600, 600, 600, 600, 600, 600, 600};
+const int sensor_number = 8;
+int sensor[sensor_number];
+
 #define SERVO_DEFAULT 90
 #define SERVO_L_MAX   45
 #define SERVO_R_MAX   135
@@ -66,103 +77,144 @@ void setup() {
 }
 
 void loop() {
-  Usb.Task();
+  if (gMode == MANUAL) {
+    Usb.Task();
+  
+    if (PS3.PS3Connected || PS3.PS3NavigationConnected) {
+  
+      switch(direction(PS3.getAnalogHat(RightHatX),PS3.getAnalogHat(RightHatY))){
+        case 0:
+          Serial.print(F("\r\nStop"));
+          Stop();
+          break;
+        case 1:
+        case 2:
+        case 12:
+          Serial.print(F("\r\nLeft"));
+          l_pwm = int(map(PS3.getAnalogHat(RightHatX), 127, 0, MOTOR_MIN, 255));
+          r_pwm = int(map(PS3.getAnalogHat(RightHatX), 127, 0, MOTOR_MIN, 255));
+          Left(l_pwm, r_pwm);
+          break;
+        case 3:
+        case 4:
+        case 5:
+          Serial.print(F("\r\nDown"));
+          l_pwm = int(map(PS3.getAnalogHat(RightHatY), 127, 255, MOTOR_MIN, 255));
+          r_pwm = int(map(PS3.getAnalogHat(RightHatY), 127, 255, MOTOR_MIN, 255));
+          Down(l_pwm, r_pwm);
+          break;
+        case 6:
+        case 7:
+        case 8:
+          Serial.print(F("\r\nRight"));
+          l_pwm = int(map(PS3.getAnalogHat(RightHatX), 127, 255, MOTOR_MIN, 255));
+          r_pwm = int(map(PS3.getAnalogHat(RightHatX), 127, 255, MOTOR_MIN, 255));
+          Right(l_pwm, r_pwm);
+          break;
+        case 9:
+        case 10:
+        case 11:
+          Serial.print(F("\r\nUp"));
+          l_pwm = int(map(PS3.getAnalogHat(RightHatY), 127, 0, MOTOR_MIN, 255));
+          r_pwm = int(map(PS3.getAnalogHat(RightHatY), 127, 0, MOTOR_MIN, 255));
+          Up(l_pwm, r_pwm);
+          break;
+        default:
+          Stop();
+          break;
+      }
+  
+      if (PS3.getAnalogHat(LeftHatX) < 117) {
+        Serial.print(F("\r\nLeftHatX: "));
+        servo_pos = int(map(PS3.getAnalogHat(LeftHatX), 127, 0, SERVO_DEFAULT, SERVO_L_MAX));
+      } else if (PS3.getAnalogHat(LeftHatX) > 137) {
+        Serial.print(F("\r\nLeftHatX: "));
+        servo_pos = int(map(PS3.getAnalogHat(LeftHatX), 127, 255, SERVO_DEFAULT, SERVO_R_MAX));
+      } else {
+        servo_pos = SERVO_DEFAULT;
+      }
+      servo.write(servo_pos);
+      
+      if (PS3.getButtonClick(PS)) {
+        Serial.print(F("\r\nPS"));
+        PS3.disconnect();
+      }
+      else {
+        if (PS3.getButtonPress(TRIANGLE)) {
+          Serial.print(F("\r\nTraingle"));
+        }
+        if (PS3.getButtonPress(CIRCLE)) {
+          Serial.print(F("\r\nCircle"));
+        }
+        if (PS3.getButtonPress(CROSS)) {
+          Serial.print(F("\r\nCross"));
+        }
+        if (PS3.getButtonPress(SQUARE)) {
+          Serial.print(F("\r\nSquare"));
+        }
+  
+        if (PS3.getButtonPress(UP)) {
+          Serial.print(F("\r\nUp"));
+        }
+        if (PS3.getButtonPress(RIGHT)) {
+          Serial.print(F("\r\nRight"));
+        }
+        if (PS3.getButtonPress(DOWN)) {
+          Serial.print(F("\r\nDown"));
+        }
+        if (PS3.getButtonPress(LEFT)) {
+          Serial.print(F("\r\nLeft"));
+        }
+        
+        if (PS3.getButtonClick(SELECT)) {
+          Serial.print(F("\r\nSelect - "));
+          PS3.printStatusString();
+        }
+        if (PS3.getButtonClick(START)) {
+          Serial.print(F("\r\nStart"));
+          printAngle = !printAngle;
+        }
+      }
+    }
+  } else if (gMode == AUTO) {
+    int trace = 0;
+    
+    for (int i = 0; i < sensor_number; i++) {
+      sensor[i] = analogRead(i);
+      if (sensor[i] < threshold[i]){
+        trace = trace | (trace << i);
+      }
+      Serial.print(sensor[i]);
+      Serial.print("\t");
+    }
+    Serial.println(trace);
 
-  if (PS3.PS3Connected || PS3.PS3NavigationConnected) {
-
-    switch(direction(PS3.getAnalogHat(RightHatX),PS3.getAnalogHat(RightHatY))){
+    switch(trace) {
       case 0:
-        Serial.print(F("\r\nStop"));
-        Stop();
         break;
       case 1:
+        servo_pos = 45;
+        break;
       case 2:
-      case 12:
-        Serial.print(F("\r\nLeft"));
-        l_pwm = int(map(PS3.getAnalogHat(RightHatX), 127, 0, MOTOR_MIN, 255));
-        r_pwm = int(map(PS3.getAnalogHat(RightHatX), 127, 0, MOTOR_MIN, 255));
-        Left(l_pwm, r_pwm);
+        servo_pos = 70;
         break;
-      case 3:
       case 4:
-      case 5:
-        Serial.print(F("\r\nDown"));
-        l_pwm = int(map(PS3.getAnalogHat(RightHatY), 127, 255, MOTOR_MIN, 255));
-        r_pwm = int(map(PS3.getAnalogHat(RightHatY), 127, 255, MOTOR_MIN, 255));
-        Down(l_pwm, r_pwm);
+        servo_pos = 90;
         break;
-      case 6:
-      case 7:
       case 8:
-        Serial.print(F("\r\nRight"));
-        l_pwm = int(map(PS3.getAnalogHat(RightHatX), 127, 255, MOTOR_MIN, 255));
-        r_pwm = int(map(PS3.getAnalogHat(RightHatX), 127, 255, MOTOR_MIN, 255));
-        Right(l_pwm, r_pwm);
+        servo_pos = 110;
         break;
-      case 9:
-      case 10:
-      case 11:
-        Serial.print(F("\r\nUp"));
-        l_pwm = int(map(PS3.getAnalogHat(RightHatY), 127, 0, MOTOR_MIN, 255));
-        r_pwm = int(map(PS3.getAnalogHat(RightHatY), 127, 0, MOTOR_MIN, 255));
-        Up(l_pwm, r_pwm);
+      case 16:
+        servo_pos = 135;
         break;
       default:
-        Stop();
         break;
     }
-
-    if (PS3.getAnalogHat(LeftHatX) < 117) {
-      Serial.print(F("\r\nLeftHatX: "));
-      servo_pos = int(map(PS3.getAnalogHat(LeftHatX), 127, 0, SERVO_DEFAULT, SERVO_L_MAX));
-    } else if (PS3.getAnalogHat(LeftHatX) > 137) {
-      Serial.print(F("\r\nLeftHatX: "));
-      servo_pos = int(map(PS3.getAnalogHat(LeftHatX), 127, 255, SERVO_DEFAULT, SERVO_R_MAX));
-    } else {
-      servo_pos = SERVO_DEFAULT;
-    }
-    servo.write(servo_pos);
     
-    if (PS3.getButtonClick(PS)) {
-      Serial.print(F("\r\nPS"));
-      PS3.disconnect();
-    }
-    else {
-      if (PS3.getButtonPress(TRIANGLE)) {
-        Serial.print(F("\r\nTraingle"));
-      }
-      if (PS3.getButtonPress(CIRCLE)) {
-        Serial.print(F("\r\nCircle"));
-      }
-      if (PS3.getButtonPress(CROSS)) {
-        Serial.print(F("\r\nCross"));
-      }
-      if (PS3.getButtonPress(SQUARE)) {
-        Serial.print(F("\r\nSquare"));
-      }
-
-      if (PS3.getButtonPress(UP)) {
-        Serial.print(F("\r\nUp"));
-      }
-      if (PS3.getButtonPress(RIGHT)) {
-        Serial.print(F("\r\nRight"));
-      }
-      if (PS3.getButtonPress(DOWN)) {
-        Serial.print(F("\r\nDown"));
-      }
-      if (PS3.getButtonPress(LEFT)) {
-        Serial.print(F("\r\nLeft"));
-      }
-      
-      if (PS3.getButtonClick(SELECT)) {
-        Serial.print(F("\r\nSelect - "));
-        PS3.printStatusString();
-      }
-      if (PS3.getButtonClick(START)) {
-        Serial.print(F("\r\nStart"));
-        printAngle = !printAngle;
-      }
-    }
+    servo.write(servo_pos);
+    Up(l_pwm, r_pwm);
+  } else {
+    ;
   }
 }
 
