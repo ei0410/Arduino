@@ -17,5 +17,7 @@ void loop() {
     Serial.print("\t");
     #endif
   }
+  #ifdef DEBUG
   Serial.println("");
+  #endif
 }

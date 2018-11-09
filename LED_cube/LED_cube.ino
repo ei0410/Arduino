@@ -1,5 +1,5 @@
 const int anode_pins[] = {34, 35, 36, 37, 38, 39, 40, 41, 42};
-const int cathode_pins[] = {43, 44, 45,};
+const int cathode_pins[] = {43, 44, 45};
 const int number_of_anode_pins = sizeof(anode_pins) / sizeof(anode_pins[0]);
 const int number_of_cathode_pins = sizeof(cathode_pins) / sizeof(cathode_pins[0]);
 

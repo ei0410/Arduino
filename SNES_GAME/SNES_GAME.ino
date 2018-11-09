@@ -15,7 +15,7 @@ Status gStatus = INIT;
 #include <SNESpad.h>
 #include <TimerOne.h>
 
-SNESpad pad = SNESpad(6, 7, 8);
+SNESpad pad = SNESpad(9, 10, 11);
 
 const int anode_pins[] = {32, 33, 34, 35, 36, 37, 38, 39};
 const int cathode_pins[] = {40, 41, 42, 43, 44, 45, 46, 47};

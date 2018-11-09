@@ -79,32 +79,32 @@ void loop() {
       case 2:
       case 12:
         Serial.print(F("\r\nLeft"));
-        l_pwm = map(PS3.getAnalogHat(RightHatX), 127, 0, MOTOR_MIN, 255);
-        r_pwm = map(PS3.getAnalogHat(RightHatX), 127, 0, MOTOR_MIN, 255);
+        l_pwm = int(map(PS3.getAnalogHat(RightHatX), 127, 0, MOTOR_MIN, 255));
+        r_pwm = int(map(PS3.getAnalogHat(RightHatX), 127, 0, MOTOR_MIN, 255));
         Left(l_pwm, r_pwm);
         break;
       case 3:
       case 4:
       case 5:
         Serial.print(F("\r\nDown"));
-        l_pwm = map(PS3.getAnalogHat(RightHatY), 127, 255, MOTOR_MIN, 255);
-        r_pwm = map(PS3.getAnalogHat(RightHatY), 127, 255, MOTOR_MIN, 255);
+        l_pwm = int(map(PS3.getAnalogHat(RightHatY), 127, 255, MOTOR_MIN, 255));
+        r_pwm = int(map(PS3.getAnalogHat(RightHatY), 127, 255, MOTOR_MIN, 255));
         Down(l_pwm, r_pwm);
         break;
       case 6:
       case 7:
       case 8:
         Serial.print(F("\r\nRight"));
-        l_pwm = map(PS3.getAnalogHat(RightHatX), 127, 255, MOTOR_MIN, 255);
-        r_pwm = map(PS3.getAnalogHat(RightHatX), 127, 255, MOTOR_MIN, 255);
+        l_pwm = int(map(PS3.getAnalogHat(RightHatX), 127, 255, MOTOR_MIN, 255));
+        r_pwm = int(map(PS3.getAnalogHat(RightHatX), 127, 255, MOTOR_MIN, 255));
         Right(l_pwm, r_pwm);
         break;
       case 9:
       case 10:
       case 11:
         Serial.print(F("\r\nUp"));
-        l_pwm = map(PS3.getAnalogHat(RightHatY), 127, 0, MOTOR_MIN, 255);
-        r_pwm = map(PS3.getAnalogHat(RightHatY), 127, 0, MOTOR_MIN, 255);
+        l_pwm = int(map(PS3.getAnalogHat(RightHatY), 127, 0, MOTOR_MIN, 255));
+        r_pwm = int(map(PS3.getAnalogHat(RightHatY), 127, 0, MOTOR_MIN, 255));
         Up(l_pwm, r_pwm);
         break;
       default:
@@ -114,10 +114,10 @@ void loop() {
 
     if (PS3.getAnalogHat(LeftHatX) < 117) {
       Serial.print(F("\r\nLeftHatX: "));
-      servo_pos = map(PS3.getAnalogHat(LeftHatX), 127, 0, SERVO_DEFAULT, SERVO_L_MAX);
+      servo_pos = int(map(PS3.getAnalogHat(LeftHatX), 127, 0, SERVO_DEFAULT, SERVO_L_MAX));
     } else if (PS3.getAnalogHat(LeftHatX) > 137) {
       Serial.print(F("\r\nLeftHatX: "));
-      servo_pos = map(PS3.getAnalogHat(LeftHatX), 127, 255, SERVO_DEFAULT, SERVO_R_MAX);
+      servo_pos = int(map(PS3.getAnalogHat(LeftHatX), 127, 255, SERVO_DEFAULT, SERVO_R_MAX));
     } else {
       servo_pos = SERVO_DEFAULT;
     }
