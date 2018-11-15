@@ -1,4 +1,4 @@
-const int sensor_numbers = 5;
+const int sensor_numbers = 4;
 int sensors[sensor_numbers];
 
 #define DEBUG
