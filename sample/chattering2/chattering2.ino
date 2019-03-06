@@ -20,5 +20,5 @@ void loop() {
     digitalWrite(out, LOW);
   }
 
-  state = old_state;
+  old_state = state;
 }
