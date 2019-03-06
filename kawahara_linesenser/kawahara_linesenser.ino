@@ -96,7 +96,7 @@ void loop() {
 //      break;
 //  }
 
-  pos = constrain(pos, SERVO_MIN, SERVO_MAX);
+  pos = int(constrain(pos, SERVO_MIN, SERVO_MAX));
     
   myservo.write(pos);
 }
