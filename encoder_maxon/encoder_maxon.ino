@@ -1,18 +1,13 @@
-// A相ピン割り当て
 #define ENC_A 2
-// B相ピン割り当て
 #define ENC_B 3
- 
-// B相の前回値
+
 volatile int oldEncB;
- 
-// エンコーダ値
 volatile long encValue;
- 
-void doEncoderCounter(void){
+
+void doEncoderCounter(void) {
   int newEncB = PING & _BV(5);  // int newEncB = digitalRead(ENC_B);
   int newEncA = PINE & _BV(4);  // int newEncA = digitalRead(ENC_A);
-   
+
   if (newEncA){
     if (oldEncB && !newEncB) { // up
       ++encValue;

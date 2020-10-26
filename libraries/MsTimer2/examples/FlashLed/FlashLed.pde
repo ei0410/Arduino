@@ -1,36 +1,21 @@
-/*
-  MsTimer2 is a small and very easy to use library to interface Timer2 with
-  humans. It's called MsTimer2 because it "hardcodes" a resolution of 1
-  millisecond on timer2
-  For Details see: http://www.arduino.cc/playground/Main/MsTimer2
-*/
 #include <MsTimer2.h>
 
-// Switch on LED on and off each half second
-
-#if ARDUINO >= 100
-const int led_pin = LED_BUILTIN;	// 1.0 built in LED pin var
-#else
-const int led_pin = 13;			// default to pin 13
-#endif
+// Switch on LED on pin 13 each second
 
 
-void flash()
-{
+void flash() {
   static boolean output = HIGH;
   
-  digitalWrite(led_pin, output);
+  digitalWrite(13, output);
   output = !output;
 }
 
-void setup()
-{
-  pinMode(led_pin, OUTPUT);
+void setup() {
+  pinMode(13, OUTPUT);
 
   MsTimer2::set(500, flash); // 500ms period
   MsTimer2::start();
 }
 
-void loop()
-{
+void loop() {
 }

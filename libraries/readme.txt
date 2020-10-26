@@ -1,1 +1,1 @@
-ƒ‰ƒCƒuƒ‰ƒŠ‚ÌƒCƒ“ƒXƒg[ƒ‹‚É‚Â‚¢‚Ä‚ÍŸ‚ğQÆ‚µ‚Ä‚­‚¾‚³‚¢Fhttp://www.arduino.cc/en/Guide/Libraries
+ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã«ã¤ã„ã¦ã¯æ¬¡ã‚’å‚ç…§ã—ã¦ãã ã•ã„ï¼šhttp://www.arduino.cc/en/Guide/Libraries
